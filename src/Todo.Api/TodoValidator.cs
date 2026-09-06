@@ -2,7 +2,7 @@ namespace Todo.Api;
 
 public static class TodoValidator
 {
-    public const int MaxTitleLength = 120;
+    public const int MaxTitleLength = 5;
 
     public static bool IsValidTitle(string? title)
     {
