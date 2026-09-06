@@ -26,6 +26,9 @@ app.MapPost("/todos", async (TodoRepository repo, CreateTodoRequest request, Can
     return Results.Created($"/todos/{created.Id}", created);
 });
 
+app.MapGet("/todos/{id:int}", async (TodoRepository repo, int id, CancellationToken ct) =>
+    await repo.FindAsync(id, ct) is { } item ? Results.Ok(item) : Results.NotFound());
+
 app.MapPost("/todos/{id:int}/complete", async (TodoRepository repo, int id, CancellationToken ct) =>
     await repo.CompleteAsync(id, ct) ? Results.NoContent() : Results.NotFound());
 
