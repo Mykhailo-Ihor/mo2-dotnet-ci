@@ -53,6 +53,23 @@ public sealed class TodoRepository
         return items;
     }
 
+    public async Task<TodoItem?> FindAsync(int id, CancellationToken ct = default)
+    {
+        await using var conn = new NpgsqlConnection(_connectionString);
+        await conn.OpenAsync(ct);
+        await using var cmd = new NpgsqlCommand("SELECT id, title, done FROM todos WHERE id = @id", conn);
+        cmd.Parameters.AddWithValue("id", id);
+
+        await using var reader = await cmd.ExecuteReaderAsync(ct);
+
+        if (!await reader.ReadAsync(ct))
+        {
+            return null;
+        }
+
+        return new TodoItem(reader.GetInt32(0), reader.GetString(1), reader.GetBoolean(2));
+    }
+
     public async Task<bool> CompleteAsync(int id, CancellationToken ct = default)
     {
         await using var conn = new NpgsqlConnection(_connectionString);

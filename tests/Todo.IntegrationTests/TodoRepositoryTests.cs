@@ -67,6 +67,37 @@ public class TodoRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task FindAsync_ReturnsStoredTodo()
+    {
+        var created = await _repo.AddAsync("find me");
+
+        var found = await _repo.FindAsync(created.Id);
+
+        Assert.NotNull(found);
+        Assert.Equal(created.Id, found.Id);
+        Assert.Equal("find me", found.Title);
+        Assert.False(found.Done);
+    }
+
+    [Fact]
+    public async Task FindAsync_ReturnsNullForMissingTodo()
+    {
+        Assert.Null(await _repo.FindAsync(9999));
+    }
+
+    [Fact]
+    public async Task FindAsync_ReflectsCompletion()
+    {
+        var created = await _repo.AddAsync("finish me");
+        await _repo.CompleteAsync(created.Id);
+
+        var found = await _repo.FindAsync(created.Id);
+
+        Assert.NotNull(found);
+        Assert.True(found.Done);
+    }
+
+    [Fact]
     public async Task ResetAsync_ClearsTableAndRestartsIdentity()
     {
         await _repo.AddAsync("gone soon");
